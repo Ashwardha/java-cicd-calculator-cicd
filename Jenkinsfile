@@ -5,7 +5,7 @@ pipeline {
 
         stage('Clone Repository') {
             steps {
-                git 'https://github.com/ashwardha/java-cicd-calculator-cicd.git'
+                git branch: 'main', url: 'https://github.com/ashwardha/java-cicd-calculator-cicd.git'
             }
         }
 
