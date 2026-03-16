@@ -3,12 +3,6 @@ pipeline {
 
     stages {
 
-        stage('Clone Repository') {
-            steps {
-                git branch: 'main', url: 'https://github.com/ashwardha/java-cicd-calculator-cicd.git'
-            }
-        }
-
         stage('Build Application') {
             steps {
                 sh 'mvn clean package'
@@ -23,7 +17,12 @@ pipeline {
 
         stage('Push Docker Image') {
             steps {
-                sh 'docker push ashwardha/java-cicd-app:latest'
+                withCredentials([usernamePassword(credentialsId: 'dockerhub-creds', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                    sh '''
+                        echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
+                        docker push ashwardha/java-cicd-app:latest
+                    '''
+                }
             }
         }
 
@@ -32,6 +31,5 @@ pipeline {
                 sh 'kubectl set image deployment/java-cicd-app java-cicd-app=ashwardha/java-cicd-app:latest'
             }
         }
-
     }
 }
